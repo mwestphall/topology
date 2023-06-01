@@ -29,6 +29,7 @@
                   <xsd:sequence>
                     <xsd:element name="ID" type="xsd:int" />
                     <xsd:element name="Name" type="xsd:string" />
+                    <xsd:element name="IsCCStar" type="boolean" minOccurs="0" />
                   </xsd:sequence>
                 </xsd:complexType>
               </xsd:element>
@@ -37,11 +38,12 @@
                   <xsd:sequence>
                     <xsd:element name="ID" type="xsd:int" />
                     <xsd:element name="Name" type="xsd:string" />
+                    <xsd:element name="IsCCStar" type="boolean" minOccurs="0" />
                     <xsd:element name="AddressLine1" type="xsd:string" minOccurs="0" />
                     <xsd:element name="AddressLine2" type="xsd:string" minOccurs="0" />
                     <xsd:element name="City" type="xsd:string" minOccurs="0" />
                     <xsd:element name="Country" type="xsd:string" minOccurs="0" />
-                    <xsd:element name="Description" type="xsd:string" minOccurs="0" /> 
+                    <xsd:element name="Description" type="xsd:string" minOccurs="0" />
                     <xsd:element name="Latitude" type="xsd:string" minOccurs="0" />
                     <xsd:element name="LongName" type="xsd:string" minOccurs="0" />
                     <xsd:element name="Longitude" type="xsd:string" minOccurs="0" />
@@ -59,6 +61,8 @@
                 </xsd:complexType>
               </xsd:element>
               <xsd:element minOccurs="0" name="GroupDescription" type="xsd:string" />
+              <xsd:element name="IsCCStar" type="boolean" minOccurs="0"/>
+              <xsd:element name="Production" type="boolean" />
               <xsd:element name="Resources">
                 <xsd:complexType>
                   <xsd:sequence>
@@ -147,6 +151,7 @@
                                 <xsd:element name="StorageCapacityMax" type="xsd:string"/>
                                 <xsd:element name="HEPSPEC" type="xsd:string" />
                                 <xsd:element minOccurs="0" name="APELNormalFactor" type="xsd:string" />
+                                <xsd:element minOccurs="0" name="HEPScore23Percentage" type="xsd:float" />
                                 <xsd:element name="TapeCapacity" type="xsd:string"/>
                               </xsd:sequence>
                             </xsd:complexType>
@@ -184,6 +189,7 @@
                               </xsd:sequence>
                             </xsd:complexType>
                           </xsd:element>
+                          <xsd:element name="IsCCStar" type="boolean" minOccurs="0"/>
                           <xsd:element minOccurs="0" name="OpenGOCTickets">
                             <xsd:complexType>
                               <xsd:sequence>
