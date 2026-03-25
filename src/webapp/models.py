@@ -36,7 +36,6 @@ topology_update_summary = Summary('topology_update_seconds', 'Time spent updatin
 topology_git_update_summary = Summary('topology_git_update_seconds', 'Time spent pulling/cloning the topology git repo')
 contact_update_summary = Summary('contact_update_seconds', 'Time spent updating the contact repo data')
 comanage_update_summary = Summary('comanage_update_seconds', 'Time spent updating the comanage LDAP data')
-ligo_update_summary = Summary('ligo_update_seconds', 'Time spent updating the LIGO LDAP data')
 
 
 class CachedData:
@@ -77,15 +76,12 @@ class GlobalData:
         config.setdefault("CILOGON_LDAP_URL", "ldaps://ldap.cilogon.org")
         config.setdefault("CILOGON_LDAP_USER",
                 "uid=readonly_user,ou=system,o=OSG,o=CO,dc=cilogon,dc=org")
-        config.setdefault("LIGO_LDAP_URL", "ldaps://ldap.ligo.org")
-        config.setdefault("LIGO_LDAP_USER", "uid=osg-services-brian-lin,ou=system,dc=ligo,dc=org")
         config.setdefault("NO_GIT", True)
         contact_cache_lifetime = config.get("CONTACT_CACHE_LIFETIME", config.get("CACHE_LIFETIME", 60*15))
         topology_cache_lifetime = config.get("TOPOLOGY_CACHE_LIFETIME", config.get("CACHE_LIFETIME", 60*15))
         self.contacts_data = CachedData(cache_lifetime=contact_cache_lifetime)
         self.comanage_data = CachedData(cache_lifetime=contact_cache_lifetime)
         self.merged_contacts_data = CachedData(cache_lifetime=contact_cache_lifetime)
-        self.ligo_dn_list = CachedData(cache_lifetime=contact_cache_lifetime)
         self.dn_set = CachedData(cache_lifetime=topology_cache_lifetime)
         self.projects = CachedData(cache_lifetime=topology_cache_lifetime)
         self.topology = CachedData(cache_lifetime=topology_cache_lifetime)
@@ -105,9 +101,6 @@ class GlobalData:
         self.cilogon_ldap_passfile = config.get("CILOGON_LDAP_PASSFILE")
         self.cilogon_ldap_url = config.get("CILOGON_LDAP_URL")
         self.cilogon_ldap_user = config.get("CILOGON_LDAP_USER")
-        self.ligo_ldap_passfile = config.get("LIGO_LDAP_PASSFILE")
-        self.ligo_ldap_url = config.get("LIGO_LDAP_URL")
-        self.ligo_ldap_user = config.get("LIGO_LDAP_USER")
         self.github_oauth_client_secret = config.get("GITHUB_OAUTH_CLIENT_SECRET")
         self.auto_pr_gh_api_user = config.get("AUTO_PR_GH_API_USER")
         self.auto_pr_gh_api_token = config.get("AUTO_PR_GH_API_TOKEN")
@@ -262,30 +255,6 @@ class GlobalData:
                 self.merged_contacts_data.try_again()
 
         return self.merged_contacts_data.data
-
-    def get_ligo_dn_list(self) -> Optional[List[str]]:
-        """
-        Get list of DNs of authorized LIGO users from their LDAP
-        May return None if we fail to get the data for the first time.
-        """
-        if not (self.ligo_ldap_url and self.ligo_ldap_user and
-                self.ligo_ldap_passfile):
-            log.debug("LIGO_LDAP_{URL|USER|PASSFILE} not specified; "
-                      "getting empty list")
-            return []
-        elif self.ligo_dn_list.should_update():
-            with ligo_update_summary.time():
-                try:
-                    ligo_ldap_pass = readfile(self.ligo_ldap_passfile, log)
-                    new_dn_list = ldap_data.get_ligo_ldap_dn_list(self.ligo_ldap_url, self.ligo_ldap_user, ligo_ldap_pass)
-                    self.ligo_dn_list.update(new_dn_list)
-                except Exception as err:
-                    if self.strict:
-                        raise
-                    log.exception("Failed to update LIGO data (%s)", err)
-                    self.ligo_dn_list.try_again()
-
-        return self.ligo_dn_list.data
 
     def get_dns(self) -> Optional[Set]:
         """
