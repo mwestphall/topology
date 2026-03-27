@@ -3,7 +3,7 @@ version: "3.3"
 services:
 
   topology:
-    #image: opensciencegrid/topology
+    image: hub.opensciencegrid.org/opensciencegrid/topology:1.69.3
     build: .
     volumes:
       # apache
